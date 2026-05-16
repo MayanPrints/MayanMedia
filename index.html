@@ -22,19 +22,8 @@ input,textarea,select{background:var(--cardB);border:1px solid var(--border);col
 input:focus,textarea:focus,select:focus{border-color:var(--accent)}
 button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:500}
 
-/* ── LOGIN INTERFACE ── */
-.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
-.login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:400px;padding:40px 32px;box-shadow:0 20px 40px rgba(0,0,0,.5)}
-.login-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);text-align:center;margin-bottom:8px;letter-spacing:-0.5px}
-.login-subtitle{color:var(--muted);font-size:14px;text-align:center;margin-bottom:32px}
-.form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
-.form-group label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
-.btn-login{width:100%;background:var(--accent);color:var(--bg);padding:12px;font-weight:600;font-size:15px;margin-top:8px;box-shadow:0 4px 12px rgba(232,184,75,.2)}
-.btn-login:hover{opacity:.9;transform:translateY(-1px)}
-.btn-login:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;box-shadow:none}
-
-/* ── APP SHELL ── */
-.app-shell{display:none;height:100%;grid-template-columns:260px 1fr}
+/* ── APP SHELL (VISIBLE POR DEFECTO) ── */
+.app-shell{display:grid;height:100%;grid-template-columns:260px 1fr}
 .sidebar{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px}
 .sb-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--accent);margin-bottom:32px;padding-left:12px}
 .sb-menu{display:flex;flex-direction:column;gap:6px;flex:1}
@@ -51,25 +40,6 @@ button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;border-
 </head>
 <body>
 
-<div id="login-screen" class="login-screen">
-  <div class="login-card">
-    <div class="login-logo">MAYAN MEDIA</div>
-    <div class="login-subtitle">Sistema Interno de Cotizaciones</div>
-    
-    <form id="login-form">
-      <div class="form-group">
-        <label for="login-username">Usuario</label>
-        <input type="text" id="login-username" required placeholder="Tu usuario">
-      </div>
-      <div class="form-group">
-        <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required placeholder="••••••••">
-      </div>
-      <button type="submit" id="login-submit-btn" class="btn-login">Ingresar al Sistema</button>
-    </form>
-  </div>
-</div>
-
 <div id="app-shell" class="app-shell">
   <aside class="sidebar">
     <div class="sb-logo">MAYAN MEDIA</div>
@@ -82,139 +52,64 @@ button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;border-
     </nav>
     <div class="sb-user">
       <div>
-        <div style="font-weight:600" id="user-display-name">Usuario</div>
-        <div style="color:var(--muted);font-size:11px" id="user-display-role">Rol</div>
+        <div style="font-weight:600" id="user-display-name">Admin Principal</div>
+        <div style="color:var(--muted);font-size:11px" id="user-display-role">Administrador</div>
       </div>
-      <button class="logout-btn" id="btn-logout">Salir</button>
+      <button class="logout-btn" id="btn-logout" style="display:none;">Salir</button>
     </div>
   </aside>
 
   <main class="main-content">
     <section id="view-clientes" class="view-panel active">
       <h2>Módulo de Clientes</h2>
-      <p style="color:var(--muted); margin-top:8px;">Cargando base de datos...</p>
+      <p style="color:var(--muted); margin-top:12px;">Aquí puedes comenzar a integrar el listado o las tarjetas de clientes.</p>
     </section>
 
     <section id="view-cotizador" class="view-panel">
       <h2>Generar Cotización</h2>
+      <p style="color:var(--muted); margin-top:12px;">Sección destinada al cálculo de insumos, prendas y precios.</p>
     </section>
 
     <section id="view-historial" class="view-panel">
       <h2>Historial de Ventas</h2>
+      <p style="color:var(--muted); margin-top:12px;">Registro general de los folios cotizados.</p>
     </section>
 
     <section id="view-cola" class="view-panel">
       <h2>Cola de Producción</h2>
+      <p style="color:var(--muted); margin-top:12px;">Seguimiento de estados del flujo textil.</p>
     </section>
 
     <section id="view-finanzas" class="view-panel">
       <h2>Reporte Financiero</h2>
+      <p style="color:var(--muted); margin-top:12px;">Métricas globales y saldos de clientes.</p>
     </section>
   </main>
 </div>
 
 <script>
-// ==========================================
-//  CONFIGURACIÓN DEL BACKEND (API_URL)
-// ==========================================
-const API_URL = "https://script.google.com/macros/s/AKfycbwYnTai___6K7pz7e4amkoeLWSCZRb8MRGNDX4nGCQEOiBiOgGlyMlfUxD_BdtEOqk/exec";
+// URL del Backend de respaldo por si necesitas hacer llamadas de datos más adelante
+const API_URL = "https://script.google.com/macros/s/AKfycbyA1saXWV5bjYzkFy_B8lvsXMhWoDc20f-1dVUBBigsZ1WE7nxqJbc2_cV0HZmw4tcj9w/exec";
 
-// Elementos de la Interfaz
-const loginScreen = document.getElementById('login-screen');
-const appShell = document.getElementById('app-shell');
-const loginForm = document.getElementById('login-form');
-const loginSubmitBtn = document.getElementById('login-submit-btn');
-
-// --- MANEJO DEL LOGIN CORREGIDO PARA EVITAR EL ERROR 400 ---
-loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const txtUsuario = document.getElementById('login-username').value.trim();
-  const txtPassword = document.getElementById('login-password').value.trim();
-
-  loginSubmitBtn.disabled = true;
-  const originalText = loginSubmitBtn.innerHTML;
-  loginSubmitBtn.innerHTML = 'Verificando credenciales...';
-
-  try {
-    // Para resolver el error 400 mandamos la acción mediante URL params y el payload estructurado
-    const targetUrl = ${API_URL}?action=login;
-    
-    const response = await fetch(targetUrl, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify({
-        username: txtUsuario,
-        password: txtPassword
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(Error de respuesta: ${response.status});
-    }
-
-    const data = await response.json();
-
-    if (data.success) {
-      localStorage.setItem('mayan_session', JSON.stringify(data.user));
-      initApp(data.user);
-    } else {
-      alert('Error: ' + (data.message || 'Contraseña o usuario incorrectos.'));
-    }
-
-  } catch (error) {
-    console.error("Fallo de conexión:", error);
-    alert('Error al conectar con Google Apps Script. Asegúrate de que la Web App esté bien implementada con acceso a "Cualquier persona".');
-  } finally {
-    loginSubmitBtn.innerHTML = originalText;
-    loginSubmitBtn.disabled = false;
-  }
-});
-  // Inicializar Aplicación al Autenticarse con éxito
-function initApp(user) {
-  loginScreen.style.display = 'none';
-  appShell.style.display = 'grid';
-  
-  document.getElementById('user-display-name').textContent = user.nombre || user.username;
-  document.getElementById('user-display-role').textContent = user.rol || 'Operador';
-  
-  // Aquí se desencadenan las funciones de tu archivo original para pintar las tablas
-  console.log("Sesión iniciada con éxito para:", user.username);
-}
-
-// Cierre de Sesión
-document.getElementById('btn-logout').addEventListener('click', () => {
-  localStorage.removeItem('mayan_session');
-  location.reload();
-});
-
-// Navegación Básica del Sidebar
+// Navegación Interactiva del Sidebar
 document.querySelectorAll('.sb-item').forEach(item => {
   item.addEventListener('click', (e) => {
     e.preventDefault();
+    // Quitar estados activos previos
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
     
+    // Agregar estado activo al seleccionado
     item.classList.add('active');
     const targetView = item.getAttribute('data-view');
     document.getElementById(view-${targetView}).classList.add('active');
   });
 });
 
-// Auto-login si la sesión está activa
+// Inicialización automática simulada de la sesión
 window.addEventListener('DOMContentLoaded', () => {
-  const savedSession = localStorage.getItem('mayan_session');
-  if (savedSession) {
-    try {
-      const user = JSON.parse(savedSession);
-      initApp(user);
-    } catch(e) {
-      localStorage.removeItem('mayan_session');
-    }
-  }
+  console.log("Acceso directo concedido: Modo de desarrollo/diseño activo.");
+  // Aquí puedes agregar directamente las funciones de carga de datos sin que pasen por un login
 });
 </script>
 </body>
