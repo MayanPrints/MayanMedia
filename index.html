@@ -7,10 +7,15 @@
 <style>
 /* ── RESET & BASE ── */
 ,::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{\n  --bg:#0A0A0F;--card:#13131A;--cardB:#1C1C26;--border:#252535;\n  --accent:#E8B84B;--accentS:rgba(232,184,75,.10);\n  --text:#F0EDE6;--muted:#6B6880;\n  --red:#E05252;--green:#4CC98A;--blue:#5B9BF0;--purple:#9B72F0;\n}
+:root{
+  --bg:#0A0A0F;--card:#13131A;--cardB:#1C1C26;--border:#252535;
+  --accent:#E8B84B;--accentS:rgba(232,184,75,.10);
+  --text:#F0EDE6;--muted:#6B6880;
+  --red:#E05252;--green:#4CC98A;--blue:#5B9BF0;--purple:#9B72F0;
+}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
 body{display:flex;flex-direction:column}
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght=700;800&family=Inter:wght=300;400;500;600&display=swap');
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
 input,textarea,select{background:var(--cardB);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:6px;font-family:inherit;font-size:14px;outline:none;transition:border-color .2s}
@@ -36,7 +41,7 @@ button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;border-
 .sb-item{padding:12px;color:var(--muted);text-decoration:none;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:12px}
 .sb-item:hover,.sb-item.active{color:var(--text);background:var(--cardB)}
 .sb-item.active{border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding-left:9px}
-.sb-user{border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;justify-content:between;font-size:13px}
+.sb-user{border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
 .logout-btn{background:transparent;color:var(--red);font-size:12px;padding:4px 8px}
 
 .main-content{padding:40px;overflow-y:auto;background:var(--bg)}
@@ -54,11 +59,11 @@ button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;border-
     <form id="login-form">
       <div class="form-group">
         <label for="login-username">Usuario</label>
-        <input type="text" id="login-username" required autocomplete="username" placeholder="Tu usuario">
+        <input type="text" id="login-username" required placeholder="Tu usuario">
       </div>
-        <div class="form-group">
+      <div class="form-group">
         <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
+        <input type="password" id="login-password" required placeholder="••••••••">
       </div>
       <button type="submit" id="login-submit-btn" class="btn-login">Ingresar al Sistema</button>
     </form>
@@ -109,10 +114,9 @@ button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;border-
 </div>
 
 <script>
-  // ==========================================
+// ==========================================
 //  CONFIGURACIÓN DEL BACKEND (API_URL)
 // ==========================================
-// REEMPLAZA ESTA URL CON TU MACRO REAL COMPLETA DE APPS SCRIPT SI NO ES ESTA:
 const API_URL = "https://script.google.com/macros/s/AKfycbwYnTai___6K7pz7e4amkoeLWSCZRb8MRGNDX4nGCQEOiBiOgGlyMlfUxD_BdtEOqk/exec";
 
 // Elementos de la Interfaz
@@ -121,41 +125,40 @@ const appShell = document.getElementById('app-shell');
 const loginForm = document.getElementById('login-form');
 const loginSubmitBtn = document.getElementById('login-submit-btn');
 
-// --- MANEJO DEL LOGIN CORREGIDO PARA GITHUB ---
+// --- MANEJO DEL LOGIN CORREGIDO PARA EVITAR EL ERROR 400 ---
 loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault(); // Detiene el envío estándar del formulario a GitHub
+  e.preventDefault();
 
   const txtUsuario = document.getElementById('login-username').value.trim();
   const txtPassword = document.getElementById('login-password').value.trim();
 
-  // Bloquear botón para dar feedback
   loginSubmitBtn.disabled = true;
   const originalText = loginSubmitBtn.innerHTML;
   loginSubmitBtn.innerHTML = 'Verificando credenciales...';
 
   try {
-    // Petición POST asíncrona directa hacia Google Apps Script evadiendo GitHub Pages
-    const response = await fetch(API_URL, {
+    // Para resolver el error 400 mandamos la acción mediante URL params y el payload estructurado
+    const targetUrl = ${API_URL}?action=login;
+    
+    const response = await fetch(targetUrl, {
       method: 'POST',
-      mode: 'cors', 
+      mode: 'cors',
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8' // Obliga a que no salte error de pre-vuelo (OPTIONS)
+        'Content-Type': 'text/plain;charset=utf-8'
       },
       body: JSON.stringify({
-        action: 'login',
         username: txtUsuario,
         password: txtPassword
       })
     });
 
     if (!response.ok) {
-      throw new Error(Error en el servidor: ${response.status});
+      throw new Error(Error de respuesta: ${response.status});
     }
 
     const data = await response.json();
 
     if (data.success) {
-      // Guardar los datos en el navegador para mantener sesión activa si se recarga
       localStorage.setItem('mayan_session', JSON.stringify(data.user));
       initApp(data.user);
     } else {
@@ -164,23 +167,22 @@ loginForm.addEventListener('submit', async (e) => {
 
   } catch (error) {
     console.error("Fallo de conexión:", error);
-    alert('No se pudo conectar con el servidor central de Google Sheets. Verifica tu conexión a internet o la configuración del Script.');
+    alert('Error al conectar con Google Apps Script. Asegúrate de que la Web App esté bien implementada con acceso a "Cualquier persona".');
   } finally {
-    // Restaurar el botón
     loginSubmitBtn.innerHTML = originalText;
     loginSubmitBtn.disabled = false;
   }
 });
-
-// Inicializar Aplicación al Autenticarse
+  // Inicializar Aplicación al Autenticarse con éxito
 function initApp(user) {
   loginScreen.style.display = 'none';
   appShell.style.display = 'grid';
   
   document.getElementById('user-display-name').textContent = user.nombre || user.username;
   document.getElementById('user-display-role').textContent = user.rol || 'Operador';
-  // Aquí puedes llamar a tus funciones para descargar clientes/cotizaciones de la hoja
-  console.log("¡Sesión iniciada correctamente!", user);
+  
+  // Aquí se desencadenan las funciones de tu archivo original para pintar las tablas
+  console.log("Sesión iniciada con éxito para:", user.username);
 }
 
 // Cierre de Sesión
@@ -202,7 +204,7 @@ document.querySelectorAll('.sb-item').forEach(item => {
   });
 });
 
-// Verificar si ya había una sesión guardada previamente
+// Auto-login si la sesión está activa
 window.addEventListener('DOMContentLoaded', () => {
   const savedSession = localStorage.getItem('mayan_session');
   if (savedSession) {
