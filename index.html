@@ -6,1083 +6,214 @@
 <title>MAYAN MEDIA</title>
 <style>
 /* ── RESET & BASE ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0A0A0F;--card:#13131A;--cardB:#1C1C26;--border:#252535;
-  --accent:#E8B84B;--accentS:rgba(232,184,75,.10);
-  --text:#F0EDE6;--muted:#6B6880;
-  --red:#E05252;--green:#4CC98A;--blue:#5B9BF0;--purple:#9B72F0;
-}
+,::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{\n  --bg:#0A0A0F;--card:#13131A;--cardB:#1C1C26;--border:#252535;\n  --accent:#E8B84B;--accentS:rgba(232,184,75,.10);\n  --text:#F0EDE6;--muted:#6B6880;\n  --red:#E05252;--green:#4CC98A;--blue:#5B9BF0;--purple:#9B72F0;\n}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
 body{display:flex;flex-direction:column}
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&display=swap');
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
-input,textarea,select{font-family:'Inter',sans-serif;color:var(--text)}
-button{cursor:pointer;font-family:'Inter',sans-serif}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-.fade-up{animation:fadeUp .28s ease forwards}
-.spin{animation:spin .8s linear infinite;display:inline-block}
+input,textarea,select{background:var(--cardB);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:6px;font-family:inherit;font-size:14px;outline:none;transition:border-color .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+button{cursor:pointer;font-family:inherit;transition:all .2s;border:none;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:500}
+
+/* ── LOGIN INTERFACE ── */
+.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:400px;padding:40px 32px;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+.login-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);text-align:center;margin-bottom:8px;letter-spacing:-0.5px}
+.login-subtitle{color:var(--muted);font-size:14px;text-align:center;margin-bottom:32px}
+.form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.form-group label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
+.btn-login{width:100%;background:var(--accent);color:var(--bg);padding:12px;font-weight:600;font-size:15px;margin-top:8px;box-shadow:0 4px 12px rgba(232,184,75,.2)}
+.btn-login:hover{opacity:.9;transform:translateY(-1px)}
+.btn-login:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;box-shadow:none}
+
+/* ── APP SHELL ── */
+.app-shell{display:none;height:100%;grid-template-columns:260px 1fr}
+.sidebar{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px}
+.sb-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--accent);margin-bottom:32px;padding-left:12px}
+.sb-menu{display:flex;flex-direction:column;gap:6px;flex:1}
+.sb-item{padding:12px;color:var(--muted);text-decoration:none;border-radius:8px;font-size:14px;display:flex;align-items:center;gap:12px}
+.sb-item:hover,.sb-item.active{color:var(--text);background:var(--cardB)}
+.sb-item.active{border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding-left:9px}
+.sb-user{border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;justify-content:between;font-size:13px}
+.logout-btn{background:transparent;color:var(--red);font-size:12px;padding:4px 8px}
+
+.main-content{padding:40px;overflow-y:auto;background:var(--bg)}
+.view-panel{display:none}
+.view-panel.active{display:block}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════════════════════
-     LOGIN SCREEN
-══════════════════════════════════════════════════════════════════════════ -->
-<div id="loginScreen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:var(--bg)">
-  <div style="width:100%;max-width:400px" class="fade-up">
-    <!-- Logo -->
-    <div style="text-align:center;margin-bottom:36px">
-      <div style="width:56px;height:56px;background:var(--accent);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px">🟨</div>
-      <h1 style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:4px">Mayan Media</h1>
-      <p style="font-size:13px;color:var(--muted)">Sistema de cotización y gestión</p>
-    </div>
-    <!-- Card login -->
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px">
-      <div style="margin-bottom:16px">
-        <label style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Usuario</label>
-        <input id="loginUser" type="text" placeholder="tu_usuario" autocomplete="username"
-          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;outline:none;transition:border .15s"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"
-          onkeydown="if(event.key==='Enter')doLogin()">
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">MAYAN MEDIA</div>
+    <div class="login-subtitle">Sistema Interno de Cotizaciones</div>
+    
+    <form id="login-form">
+      <div class="form-group">
+        <label for="login-username">Usuario</label>
+        <input type="text" id="login-username" required autocomplete="username" placeholder="Tu usuario">
       </div>
-      <div style="margin-bottom:20px">
-        <label style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Contraseña</label>
-        <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"
-          style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;outline:none;transition:border .15s"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"
-          onkeydown="if(event.key==='Enter')doLogin()">
+        <div class="form-group">
+        <label for="login-password">Contraseña</label>
+        <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
       </div>
-      <div id="loginError" style="display:none;background:rgba(224,82,82,.12);border:1px solid var(--red);color:var(--red);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px"></div>
-      <button id="loginBtn" onclick="doLogin()"
-        style="width:100%;background:var(--accent);color:#0A0A0F;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:700;transition:opacity .15s"
-        onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-        Ingresar
-      </button>
-    </div>
-    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:16px">Versión 1.0 · Datos guardados en Google Sheets</p>
+      <button type="submit" id="login-submit-btn" class="btn-login">Ingresar al Sistema</button>
+    </form>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════════
-     APP SHELL
-══════════════════════════════════════════════════════════════════════════ -->
-<div id="appShell" style="display:none;flex:1;flex-direction:row;min-height:100vh">
-
-  <!-- SIDEBAR -->
-  <div id="sidebar" style="width:210px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto">
-    <div style="padding:22px 18px 16px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-        <div style="width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px">🟨</div>
-        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;line-height:1.3">Espacios<br>Publicitarios</div>
+<div id="app-shell" class="app-shell">
+  <aside class="sidebar">
+    <div class="sb-logo">MAYAN MEDIA</div>
+    <nav class="sb-menu">
+      <a href="#" class="sb-item active" data-view="clientes">Clientes</a>
+      <a href="#" class="sb-item" data-view="cotizador">Nueva Cotización</a>
+      <a href="#" class="sb-item" data-view="historial">Historial</a>
+      <a href="#" class="sb-item" data-view="cola">Cola de Trabajo</a>
+      <a href="#" class="sb-item" data-view="finanzas">Finanzas Globales</a>
+    </nav>
+    <div class="sb-user">
+      <div>
+        <div style="font-weight:600" id="user-display-name">Usuario</div>
+        <div style="color:var(--muted);font-size:11px" id="user-display-role">Rol</div>
       </div>
-      <div id="sessionUser" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+      <button class="logout-btn" id="btn-logout">Salir</button>
     </div>
-    <div style="height:1px;background:var(--border);margin:0 18px"></div>
-    <nav style="padding:12px 10px;flex:1" id="nav"></nav>
-    <div style="padding:0 10px 10px">
-      <button onclick="doLogout()" style="width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;text-align:left;transition:all .15s"
-        onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'"
-        onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
-        🚪 Cerrar sesión
-      </button>
-    </div>
-    <div style="padding:10px 18px 20px;font-size:10px;color:var(--muted);line-height:2.1">
-      <div>📌 Espectaculares</div><div>🚐 Valla Móvil</div><div>🚛 Remolque</div><div>📺 Pantallas Digitales</div>
-    </div>
-  </div>
+  </aside>
 
-  <!-- MAIN -->
-  <div id="main" style="flex:1;padding:32px 36px;overflow-y:auto;max-width:calc(100vw - 210px)"></div>
+  <main class="main-content">
+    <section id="view-clientes" class="view-panel active">
+      <h2>Módulo de Clientes</h2>
+      <p style="color:var(--muted); margin-top:8px;">Cargando base de datos...</p>
+    </section>
+
+    <section id="view-cotizador" class="view-panel">
+      <h2>Generar Cotización</h2>
+    </section>
+
+    <section id="view-historial" class="view-panel">
+      <h2>Historial de Ventas</h2>
+    </section>
+
+    <section id="view-cola" class="view-panel">
+      <h2>Cola de Producción</h2>
+    </section>
+
+    <section id="view-finanzas" class="view-panel">
+      <h2>Reporte Financiero</h2>
+    </section>
+  </main>
 </div>
-
-<!-- ══════════════════════════════════════════════════════════════════════════
-     TOAST
-══════════════════════════════════════════════════════════════════════════ -->
-<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:500;display:none;z-index:9999;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4)"></div>
 
 <script>
-'use strict';
-// ══════════════════════════════════════════════════════════════════════════════
-//  CONFIGURACIÓN — PON AQUÍ TU URL DE APPS SCRIPT
-// ══════════════════════════════════════════════════════════════════════════════
-const API_URL = "https://script.google.com/macros/s/AKfycbzsnPnIA3l2Sg0g7QZKS54nbWMbOKAcvhynbzVuAe7UFWT7tY-oHHksf6-Y2zMGJGaHvw/exec";
-// La URL tendrá este formato:
-// https://script.google.com/macros/s/XXXXXXXXXX/exec
+  // ==========================================
+//  CONFIGURACIÓN DEL BACKEND (API_URL)
+// ==========================================
+// REEMPLAZA ESTA URL CON TU MACRO REAL COMPLETA DE APPS SCRIPT SI NO ES ESTA:
+const API_URL = "https://script.google.com/macros/s/AKfycbwYnTai___6K7pz7e4amkoeLWSCZRb8MRGNDX4nGCQEOiBiOgGlyMlfUxD_BdtEOqk/exec";
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  ESTADO GLOBAL
-// ══════════════════════════════════════════════════════════════════════════════
-const S = {
-  token:    null,
-  user:     null,
-  tab:      "clientes",
-  clients:  [],
-  cots:     {},       // { clienteId: [cotizaciones] }
-  cola:     [],
-  quoteFor: null,     // cliente activo en formulario de cotización
-};
+// Elementos de la Interfaz
+const loginScreen = document.getElementById('login-screen');
+const appShell = document.getElementById('app-shell');
+const loginForm = document.getElementById('login-form');
+const loginSubmitBtn = document.getElementById('login-submit-btn');
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  HELPERS: API
-// ══════════════════════════════════════════════════════════════════════════════
-async function api(action, body = {}) {
+// --- MANEJO DEL LOGIN CORREGIDO PARA GITHUB ---
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault(); // Detiene el envío estándar del formulario a GitHub
+
+  const txtUsuario = document.getElementById('login-username').value.trim();
+  const txtPassword = document.getElementById('login-password').value.trim();
+
+  // Bloquear botón para dar feedback
+  loginSubmitBtn.disabled = true;
+  const originalText = loginSubmitBtn.innerHTML;
+  loginSubmitBtn.innerHTML = 'Verificando credenciales...';
+
   try {
-    const payload = { action, token: S.token, ...body };
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
+    // Petición POST asíncrona directa hacia Google Apps Script evadiendo GitHub Pages
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      mode: 'cors', 
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8' // Obliga a que no salte error de pre-vuelo (OPTIONS)
+      },
+      body: JSON.stringify({
+        action: 'login',
+        username: txtUsuario,
+        password: txtPassword
+      })
     });
-    return await res.json();
-  } catch (e) {
-    return { ok: false, error: e.message };
-  }
-}
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  HELPERS: UI
-// ══════════════════════════════════════════════════════════════════════════════
-const G = {
-  bg:"#0A0A0F",card:"#13131A",cardB:"#1C1C26",border:"#252535",
-  accent:"#E8B84B",accentS:"rgba(232,184,75,.10)",text:"#F0EDE6",muted:"#6B6880",
-  red:"#E05252",green:"#4CC98A",blue:"#5B9BF0",purple:"#9B72F0",
-};
-const IVA = 0.16;
-const fmt = (n) => isNaN(n)||n===null?"—":Number(n).toLocaleString("es-MX",{style:"currency",currency:"MXN"});
-const uid = () => Math.random().toString(36).slice(2,9);
-const clamp = (v,a,b) => Math.max(a,Math.min(b,Number(v)||0));
-const esc = (s) => String(s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-
-const SPACE_META = {
-  espectacular:{icon:"📌",label:"Espectacular",color:G.accent},
-  valla:       {icon:"🚐",label:"Valla Móvil",color:G.blue},
-  remolque:    {icon:"🚛",label:"Remolque",color:G.green},
-  pantalla:    {icon:"📺",label:"Pantalla Digital",color:G.purple},
-};
-
-function calcItem(type, it) {
-  const renta=Number(it.renta)||0, temp=Number(it.temporalidad)||1;
-  const imp=Number(it.impresion)||0, inst=Number(it.instalacion)||0;
-  const desc=clamp(it.descuento,0,100);
-  let sub=0, hasIVA=false;
-  if(type==="espectacular"||type==="remolque"){sub=renta*temp+imp+inst;hasIVA=true;}
-  else sub=renta*temp;
-  const descAmt=sub*desc/100, base=sub-descAmt, iva=hasIVA?base*IVA:0;
-  return {subtotal:sub,descAmt,base,iva,total:base+iva};
-}
-function calcGrand(quote){
-  let t=0;
-  Object.keys(SPACE_META).forEach(k=>{if(quote[k]?.enabled)quote[k].items.forEach(it=>{t+=calcItem(k,it).total;});});
-  return t;
-}
-
-function toast(msg, ok=true) {
-  const el = document.getElementById("toast");
-  el.textContent = (ok?"✅ ":"❌ ") + msg;
-  el.style.display = "block";
-  el.style.borderColor = ok ? G.green : G.red;
-  el.style.color = ok ? G.green : G.red;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.style.display="none", 3500);
-}
-
-function loading(msg="Cargando...") {
-  document.getElementById("main").innerHTML =
-    `<div style="display:flex;align-items:center;gap:12px;padding:60px 0;color:var(--muted)">
-       <span class="spin">⏳</span> ${esc(msg)}
-     </div>`;
-}
-
-function setInp(id,val){ const el=document.getElementById(id); if(el) el.value=val??"";}
-function getInp(id){ const el=document.getElementById(id); return el?el.value:""; }
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  AUTH
-// ══════════════════════════════════════════════════════════════════════════════
-async function doLogin() {
-  const username = getInp("loginUser").trim();
-  const password = getInp("loginPass");
-  if (!username || !password) { showLoginError("Completa todos los campos"); return; }
-
-  const btn = document.getElementById("loginBtn");
-  btn.textContent = "⏳ Verificando..."; btn.disabled = true;
-
-  const res = await api("login", { username, password });
-
-  btn.textContent = "Ingresar"; btn.disabled = false;
-
-  if (res.ok) {
-    S.token = res.token;
-    S.user  = { username: res.username, nombre: res.nombre };
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("appShell").style.display    = "flex";
-    document.getElementById("sessionUser").textContent   = "👤 " + res.nombre;
-    await initApp();
-  } else {
-    showLoginError(res.error || "Error de autenticación");
-  }
-}
-
-function showLoginError(msg) {
-  const el = document.getElementById("loginError");
-  el.textContent = "⚠️ " + msg;
-  el.style.display = "block";
-}
-
-function doLogout() {
-  S.token=null; S.user=null; S.clients=[];
-  document.getElementById("appShell").style.display = "none";
-  document.getElementById("loginScreen").style.display = "flex";
-  document.getElementById("loginPass").value = "";
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  INIT APP
-// ══════════════════════════════════════════════════════════════════════════════
-const NAV_ITEMS = [
-  {id:"clientes",icon:"👥",label:"Clientes"},
-  {id:"base",    icon:"📋",label:"Base"},
-  {id:"cola",    icon:"🗂️",label:"Cola"},
-  {id:"finanzas",icon:"💰",label:"Finanzas"},
-];
-
-async function initApp() {
-  // Render nav
-  const nav = document.getElementById("nav");
-  nav.innerHTML = NAV_ITEMS.map(n => `
-    <button id="nav_${n.id}" onclick="goTab('${n.id}')"
-      style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:500;margin-bottom:4px;text-align:left;transition:all .15s"
-      onmouseover="if(S.tab!=='${n.id}')this.style.background='var(--cardB)'"
-      onmouseout="if(S.tab!=='${n.id}')this.style.background='transparent'">
-      <span style="font-size:16px">${n.icon}</span>${n.label}
-    </button>`).join("");
-
-  loading("Cargando clientes...");
-  await loadClientes();
-  await loadCola();
-  goTab("clientes");
-}
-
-function goTab(tab) {
-  S.tab = tab; S.quoteFor = null;
-  NAV_ITEMS.forEach(n => {
-    const el = document.getElementById("nav_"+n.id);
-    if (!el) return;
-    el.style.background = n.id===tab ? "var(--accentS,rgba(232,184,75,.10))" : "transparent";
-    el.style.color      = n.id===tab ? "var(--accent)" : "var(--muted)";
-    el.style.fontWeight = n.id===tab ? "700" : "500";
-  });
-  if (tab==="clientes")  renderClientes();
-  if (tab==="base")      renderBase();
-  if (tab==="cola")      renderCola();
-  if (tab==="finanzas")  renderFinanzas();
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  DATA LOADERS
-// ══════════════════════════════════════════════════════════════════════════════
-async function loadClientes() {
-  const res = await api("getClientes");
-  if (res.ok) {
-    // Merges cotizaciones
-    S.clients = res.clientes.map(c => ({ ...c, history: S.cots[c.id] || [] }));
-  }
-}
-
-async function loadCotsForCliente(clienteId) {
-  const res = await api("getCotizaciones", { clienteId });
-  if (res.ok) {
-    S.cots[clienteId] = res.cotizaciones;
-    const c = S.clients.find(x => x.id === clienteId);
-    if (c) c.history = res.cotizaciones;
-  }
-}
-
-async function loadCola() {
-  const res = await api("getColaItems");
-  if (res.ok) S.cola = res.items;
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  HELPERS HTML
-// ══════════════════════════════════════════════════════════════════════════════
-function card(content, extra="") {
-  return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;${extra}">${content}</div>`;
-}
-function btn(label, onclick, variant="primary", sm=false, extra="") {
-  const V = {
-    primary:`background:var(--accent);color:#0A0A0F;border:none`,
-    ghost:`background:transparent;color:var(--accent);border:1px solid var(--accent)`,
-    danger:`background:transparent;color:var(--red);border:1px solid var(--red)`,
-    muted:`background:var(--cardB);color:var(--muted);border:1px solid var(--border)`,
-    green:`background:var(--green);color:#0A0A0F;border:none`,
-  };
-  const pad = sm ? "5px 12px" : "9px 18px";
-  const fz  = sm ? "11px" : "13px";
-  return `<button onclick="${onclick}" style="${V[variant]};border-radius:8px;padding:${pad};font-size:${fz};font-weight:600;white-space:nowrap;transition:opacity .15s;${extra}" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">${label}</button>`;
-}
-function inp(label, id, val="", type="text", req=false, ph="") {
-  return `<div>
-    <label style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">${label}${req?'<span style="color:var(--accent);margin-left:2px">*</span>':""}</label>
-    <input id="${id}" type="${type}" value="${esc(val)}" placeholder="${esc(ph)}"
-      style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;outline:none;transition:border .15s"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-  </div>`;
-}
-function txa(label, id, val="", rows=3, ph="") {
-  return `<div>
-    <label style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">${label}</label>
-    <textarea id="${id}" rows="${rows}" placeholder="${esc(ph)}"
-      style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;outline:none;resize:vertical;transition:border .15s"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">${esc(val)}</textarea>
-  </div>`;
-}
-function badge(text, color) {
-  return `<span style="font-size:11px;font-weight:600;background:${color}18;color:${color};padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px">${text}</span>`;
-}
-function sumRow(label, value, bold=false, accent=false, border=false, neg=false) {
-  const color = accent?"var(--accent)":neg?"var(--red)":bold?"var(--text)":"var(--muted)";
-  const val   = neg && Number(value)>0 ? `- ${fmt(value)}` : fmt(value);
-  return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:${border?"1px solid var(--border)":"none"};font-weight:${bold?700:400};font-size:${bold?14:12}px;color:${color}">
-    <span>${label}</span><span>${val}</span></div>`;
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  MODAL HELPERS
-// ══════════════════════════════════════════════════════════════════════════════
-function openModal(html) {
-  let m = document.getElementById("_modal");
-  if (!m) { m=document.createElement("div"); m.id="_modal"; document.body.appendChild(m); }
-  m.innerHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeModal()">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto" class="fade-up">${html}</div>
-  </div>`;
-}
-function closeModal() { const m=document.getElementById("_modal"); if(m) m.innerHTML=""; }
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  VISTA: CLIENTES
-// ══════════════════════════════════════════════════════════════════════════════
-function renderClientes() {
-  const totalCots = S.clients.reduce((a,c)=>a+(c.history?.length||0),0);
-  const totalRev  = S.clients.reduce((a,c)=>a+(c.history?.reduce((b,h)=>b+(h.total||0),0)||0),0);
-
-  let html = `<div class="fade-up">
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px">
-    ${[{icon:"👥",label:"Clientes",val:S.clients.length},{icon:"📋",label:"Cotizaciones",val:totalCots},{icon:"💰",label:"Revenue total",val:fmt(totalRev)}].map(s=>`
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px">
-      <div style="font-size:20px;margin-bottom:6px">${s.icon}</div>
-      <div style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent)">${s.val}</div>
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:2px">${s.label}</div>
-    </div>`).join("")}
-  </div>
-  <div style="display:flex;gap:10px;margin-bottom:18px">
-    <input id="searchInp" placeholder="🔍 Buscar cliente o empresa..." oninput="filterClientes()"
-      style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;outline:none;transition:border .15s"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-    ${btn("+ Nuevo cliente","openClienteModal(null)","primary")}
-  </div>
-  <div id="clientesList"></div>
-  </div>`;
-
-  document.getElementById("main").innerHTML = html;
-  renderClientesList();
-}
-
-function filterClientes() { renderClientesList(); }
-
-function renderClientesList() {
-  const q  = (document.getElementById("searchInp")?.value||"").toLowerCase();
-  const cs = S.clients.filter(c=>c.nombre.toLowerCase().includes(q)||(c.empresa||"").toLowerCase().includes(q));
-  const el = document.getElementById("clientesList");
-  if (!el) return;
-
-  if (!cs.length) {
-    el.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--muted)"><div style="font-size:40px;margin-bottom:10px">👥</div><p>No hay clientes aún.</p></div>`;
-    return;
-  }
-
-  el.innerHTML = cs.map(c => {
-    const spaces = [...new Set((c.history||[]).flatMap(h=>Object.keys(SPACE_META).filter(k=>h.quote?.[k]?.enabled)))];
-    return `<div id="ccard_${c.id}" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:10px;transition:border .15s"
-      onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:38px;height:38px;border-radius:50%;background:var(--accentS);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--accent);font-family:'Syne',sans-serif">${esc(c.nombre.charAt(0).toUpperCase())}</div>
-            <div><div style="font-weight:700;font-size:14px">${esc(c.nombre)}</div>${c.empresa?`<div style="font-size:12px;color:var(--muted)">${esc(c.empresa)}</div>`:""}</div>
-          </div>
-          <div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap">
-            <span style="font-size:11px;color:var(--muted)">📱 ${esc(c.whatsapp)}</span>
-            ${c.correo?`<span style="font-size:11px;color:var(--muted)">✉️ ${esc(c.correo)}</span>`:""}
-          </div>
-          ${spaces.length?`<div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">${spaces.map(k=>badge(SPACE_META[k].icon+" "+SPACE_META[k].label,SPACE_META[k].color)).join("")}</div>`:""}
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-          ${btn("+ Cotizar",`startQuote('${c.id}')`,   "primary",true)}
-          ${btn("✏️ Editar",`openClienteModal('${c.id}')`, "ghost",true)}
-          ${btn("▼ Historial",`toggleHistorial('${c.id}')`,   "muted",true,`id="btnH_${c.id}"`)}
-        </div>
-      </div>
-      <div id="hist_${c.id}" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Historial de cotizaciones</div>
-        <div id="histContent_${c.id}"><span style="color:var(--muted);font-size:12px">Cargando...</span></div>
-        <div style="margin-top:12px;padding:12px 14px;background:var(--bg);border-radius:8px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-            <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Notas del cliente</span>
-            ${btn("✏️ Editar",`editNota('${c.id}')`, "muted",true)}
-          </div>
-          <div id="notaDisplay_${c.id}" style="font-size:13px;color:${c.notas?"var(--text)":"var(--muted)"}">${c.notas||"Sin notas..."}</div>
-          <div id="notaEdit_${c.id}" style="display:none">
-            ${txa("","notaInp_"+c.id,c.notas||"",3,"Observaciones del cliente...")}
-            <div style="display:flex;gap:8px;margin-top:8px">
-              ${btn("Guardar",`saveNota('${c.id}')`, "primary",true)}
-              ${btn("Cancelar",`cancelNota('${c.id}')`, "muted",true)}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-async function toggleHistorial(id) {
-  const el  = document.getElementById("hist_"+id);
-  const btn = document.getElementById("btnH_"+id);
-  if (el.style.display==="none") {
-    el.style.display="block";
-    if(btn) btn.textContent="▲ Historial";
-    await loadCotsForCliente(id);
-    renderHistorialContent(id);
-  } else {
-    el.style.display="none";
-    if(btn) btn.textContent="▼ Historial";
-  }
-}
-
-function renderHistorialContent(cid) {
-  const el  = document.getElementById("histContent_"+cid);
-  const c   = S.clients.find(x=>x.id===cid);
-  if (!el||!c) return;
-  if (!c.history?.length) { el.innerHTML=`<p style="font-size:12px;color:var(--muted)">Sin cotizaciones guardadas.</p>`; return; }
-  el.innerHTML = c.history.map(h => `
-    <div style="background:var(--bg);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-size:12px;font-weight:600">${esc(h.date||"")}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">${Object.keys(SPACE_META).filter(k=>h.quote?.[k]?.enabled).map(k=>SPACE_META[k].icon+" "+SPACE_META[k].label).join(" · ")}</div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:14px;font-weight:700;color:var(--accent)">${fmt(h.total)}</div>
-        <button onclick="exportPDF_cot('${cid}','${h.id}')" style="margin-top:4px;font-size:11px;padding:4px 10px;border-radius:6px;background:transparent;border:1px solid var(--accent);color:var(--accent);cursor:pointer">📄 PDF</button>
-      </div>
-    </div>`).join("");
-}
-
-function editNota(cid) {
-  document.getElementById("notaDisplay_"+cid).style.display="none";
-  document.getElementById("notaEdit_"+cid).style.display="block";
-}
-function cancelNota(cid) {
-  document.getElementById("notaDisplay_"+cid).style.display="block";
-  document.getElementById("notaEdit_"+cid).style.display="none";
-}
-async function saveNota(cid) {
-  const nota = document.getElementById("notaInp_"+cid)?.value||"";
-  const c = S.clients.find(x=>x.id===cid);
-  if (!c) return;
-  c.notas = nota;
-  const res = await api("updateCliente", { cliente: c });
-  if (res.ok) {
-    document.getElementById("notaDisplay_"+cid).textContent = nota||"Sin notas...";
-    document.getElementById("notaDisplay_"+cid).style.color = nota?"var(--text)":"var(--muted)";
-    cancelNota(cid);
-    toast("Nota guardada");
-  } else toast(res.error||"Error al guardar",false);
-}
-
-// ── MODAL CLIENTE ──
-function openClienteModal(id) {
-  const c = id ? S.clients.find(x=>x.id===id) : null;
-  openModal(`
-    <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:18px">${c?"✏️ Editar cliente":"👤 Nuevo cliente"}</h3>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      ${inp("Nombre completo","cm_nombre",c?.nombre||"","text",true,"Juan García")}
-      ${inp("Empresa","cm_empresa",c?.empresa||"","text",false,"Empresa S.A. de C.V.")}
-      ${inp("WhatsApp","cm_whatsapp",c?.whatsapp||"","text",true,"+52 55 1234 5678")}
-      ${inp("Teléfono empresa","cm_telEmpresa",c?.telEmpresa||"")}
-      ${inp("Correo electrónico","cm_correo",c?.correo||"","email",false,"correo@empresa.com")}
-      ${txa("Notas","cm_notas",c?.notas||"",2,"Observaciones del cliente...")}
-    </div>
-    <div style="display:flex;gap:8px;margin-top:18px">
-      ${btn(c?"Guardar cambios":"Crear cliente",`saveClienteModal('${c?.id||""}')`, "primary")}
-      ${btn("Cancelar","closeModal()", "muted")}
-    </div>`);
-}
-
-async function saveClienteModal(id) {
-  const nombre   = getInp("cm_nombre").trim();
-  const whatsapp = getInp("cm_whatsapp").trim();
-  if (!nombre||!whatsapp) { toast("Nombre y WhatsApp son obligatorios",false); return; }
-  const data = { nombre, empresa:getInp("cm_empresa"), whatsapp, telEmpresa:getInp("cm_telEmpresa"), correo:getInp("cm_correo"), notas:getInp("cm_notas") };
-
-  if (id) {
-    const c = S.clients.find(x=>x.id===id);
-    Object.assign(c, data);
-    const res = await api("updateCliente", { cliente: c });
-    if (res.ok) { closeModal(); toast("Cliente actualizado"); renderClientesList(); }
-    else toast(res.error||"Error",false);
-  } else {
-    const res = await api("saveCliente", { cliente: data });
-    if (res.ok) {
-      S.clients.unshift({ ...data, id:res.id, history:[] });
-      closeModal(); toast("Cliente creado"); renderClientes();
-    } else toast(res.error||"Error",false);
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  COTIZACIÓN
-// ══════════════════════════════════════════════════════════════════════════════
-const DEFAULTS = {
-  espectacular:{clave:"",tamano:"",temporalidad:"1",renta:"",impresion:"",instalacion:"",descuento:"",notas:""},
-  valla:       {temporalidad:"1",renta:"",descuento:"",notas:""},
-  remolque:    {lugar:"",temporalidad:"1",renta:"",impresion:"",instalacion:"",descuento:"",notas:""},
-  pantalla:    {lugar:"",plan:"Básico",temporalidad:"1",renta:"",descuento:"",notas:""},
-};
-
-// quote state as plain object (no React)
-let QS = null; // { quote:{}, pagos:[], finNotas:"" }
-
-function startQuote(cid) {
-  const c = S.clients.find(x=>x.id===cid);
-  if (!c) return;
-  S.quoteFor = c;
-  QS = {
-    quote:{ espectacular:{enabled:false,items:[]}, valla:{enabled:false,items:[]}, remolque:{enabled:false,items:[]}, pantalla:{enabled:false,items:[]} },
-    pagos:[],
-    finNotas:"",
-  };
-  renderQuote();
-}
-
-function renderQuote() {
-  const c = S.quoteFor;
-  const grand = calcGrand(QS.quote);
-
-  let sectionsHTML = Object.keys(SPACE_META).map(k => {
-    const m = SPACE_META[k];
-    const enabled = QS.quote[k].enabled;
-    let itemsHTML = "";
-    if (enabled) {
-      itemsHTML = QS.quote[k].items.map((it,idx) => renderItemForm(k,idx,it)).join("") +
-        `<button onclick="addItem('${k}')" style="font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid ${m.color};background:transparent;color:${m.color};font-weight:600;margin-top:4px">+ Agregar ${m.label}</button>`;
-      if (!QS.quote[k].items.length) {
-        itemsHTML = `<button onclick="addItem('${k}')" style="font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid ${m.color};background:transparent;color:${m.color};font-weight:600;margin-top:4px">+ Agregar ${m.label}</button>`;
-      }
+    if (!response.ok) {
+      throw new Error(Error en el servidor: ${response.status});
     }
-    return `
-      <button onclick="toggleSection('${k}')"
-        style="width:100%;display:flex;align-items:center;gap:10px;background:${enabled?"rgba(232,184,75,.10)":"var(--cardB)"};border:1px solid ${enabled?m.color:"var(--border)"};border-radius:10px;padding:11px 16px;color:${enabled?m.color:"var(--muted)"};font-size:13px;font-weight:600;transition:all .2s;text-align:left;margin-bottom:${enabled?"8px":"4px"}">
-        <span style="font-size:18px">${m.icon}</span><span style="flex:1">${m.label}</span><span style="font-size:16px">${enabled?"▾":"▸"}</span>
-      </button>
-      ${enabled?`<div style="margin-bottom:12px;margin-left:8px">${itemsHTML}</div>`:""}`;
-  }).join("");
 
-  // Pagos
-  let pagosHTML = QS.pagos.map((p,i) => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px">
-      <span style="font-size:11px;color:var(--muted);width:90px">${esc(p.fecha||"—")}</span>
-      <span style="font-size:12px;flex:1">${esc(p.concepto)}</span>
-      <span style="font-size:13px;font-weight:600;color:${p.tipo==="ingreso"?"var(--green)":"var(--red)"};margin-right:10px">${p.tipo==="ingreso"?"+":"-"}${fmt(p.monto)}</span>
-      <button onclick="delPago(${i})" style="font-size:11px;padding:3px 8px;border-radius:6px;background:transparent;border:1px solid var(--red);color:var(--red)">✕</button>
-    </div>`).join("");
+    const data = await response.json();
 
-  const totalPagado = QS.pagos.filter(p=>p.tipo==="ingreso").reduce((a,p)=>a+(Number(p.monto)||0),0);
-  const saldo = grand - totalPagado;
+    if (data.success) {
+      // Guardar los datos en el navegador para mantener sesión activa si se recarga
+      localStorage.setItem('mayan_session', JSON.stringify(data.user));
+      initApp(data.user);
+    } else {
+      alert('Error: ' + (data.message || 'Contraseña o usuario incorrectos.'));
+    }
 
-  document.getElementById("main").innerHTML = `<div class="fade-up">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
-      ${btn("← Volver","goTab('clientes')","muted",true)}
-      <div>
-        <div style="font-family:'Syne',sans-serif;font-size:19px;font-weight:800">Nueva Cotización</div>
-        <div style="font-size:12px;color:var(--muted)">Cliente: <strong style="color:var(--accent)">${esc(c.nombre)}</strong></div>
-      </div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px">${sectionsHTML}</div>
-
-    <div style="background:linear-gradient(135deg,#1a1400,#13131A);border:1px solid var(--accent);border-radius:14px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Total general</span>
-      <span style="font-size:28px;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent)">${fmt(grand)}</span>
-    </div>
-
-    ${card(`
-      <h4 style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:14px">💳 Movimientos financieros</h4>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto auto;gap:8px;align-items:flex-end;margin-bottom:12px">
-        ${inp("Fecha","np_fecha","","date")}
-        ${inp("Concepto","np_concepto","","text",false,"Anticipo...")}
-        ${inp("Monto ($)","np_monto","","number",false,"0.00")}
-        <div><label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Tipo</label>
-          <select id="np_tipo" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:13px;width:100%"><option value="ingreso">Ingreso</option><option value="egreso">Egreso</option></select></div>
-        ${btn("+ Agregar","addPago()","green")}
-      </div>
-      ${QS.pagos.length===0?`<p style="font-size:12px;color:var(--muted);margin-bottom:10px">Sin movimientos.</p>`:pagosHTML}
-      ${QS.pagos.length>0?`<div style="display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid var(--border)"><span style="font-size:12px;color:var(--muted)">Saldo pendiente</span><span style="font-size:14px;font-weight:700;color:${saldo>0?"var(--red)":"var(--green)"}">${fmt(saldo)}</span></div>`:""}
-      <div style="margin-top:12px">${txa("Notas financieras","q_finNotas",QS.finNotas,2,"Condiciones de pago...")}</div>
-    `)}
-
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
-      ${btn("📄 Exportar PDF","exportPDFQuote()","primary")}
-      ${btn("💾 Guardar cotización","saveQuote()","ghost")}
-      ${btn("Cancelar","goTab('clientes')","muted")}
-    </div>
-  </div>`;
-}
-
-function toggleSection(k) {
-  QS.quote[k].enabled = !QS.quote[k].enabled;
-  if (QS.quote[k].enabled && !QS.quote[k].items.length) addItem(k, false);
-  renderQuote();
-}
-
-function addItem(k, rerender=true) {
-  QS.quote[k].items.push({ id:uid(), ...DEFAULTS[k] });
-  if (rerender) renderQuote();
-}
-
-function removeItem(k, idx) {
-  syncQuoteInputs();
-  QS.quote[k].items.splice(idx,1);
-  renderQuote();
-}
-
-function syncQuoteInputs() {
-  // Sync all inputs back to QS before re-render
-  Object.keys(SPACE_META).forEach(k => {
-    if (!QS.quote[k].enabled) return;
-    QS.quote[k].items.forEach((it,idx) => {
-      const fields = Object.keys(DEFAULTS[k]);
-      fields.forEach(f => {
-        const el = document.getElementById(`q_${k}_${idx}_${f}`);
-        if (el) it[f] = el.value;
-      });
-    });
-  });
-  const fn = document.getElementById("q_finNotas");
-  if (fn) QS.finNotas = fn.value;
-}
-
-function addPago() {
-  syncQuoteInputs();
-  const fecha    = getInp("np_fecha");
-  const concepto = getInp("np_concepto").trim();
-  const monto    = getInp("np_monto");
-  const tipo     = document.getElementById("np_tipo")?.value||"ingreso";
-  if (!concepto||!monto) { toast("Concepto y monto son obligatorios",false); return; }
-  QS.pagos.push({ id:uid(), fecha, concepto, monto, tipo });
-  renderQuote();
-}
-
-function delPago(i) {
-  syncQuoteInputs();
-  QS.pagos.splice(i,1);
-  renderQuote();
-}
-
-function renderItemForm(k, idx, it) {
-  const m = SPACE_META[k];
-  const r = calcItem(k, it);
-  const renta=Number(it.renta)||0, temp=Number(it.temporalidad)||1;
-
-  let fields = "";
-  const g2 = (a,b) => `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">${a}${b}</div>`;
-
-  if (k==="espectacular") {
-    fields = g2(inp("Clave",`q_${k}_${idx}_clave`,it.clave,"text",false,"BILL-001"), inp("Tamaño",`q_${k}_${idx}_tamano`,it.tamano,"text",false,'8×4 m'))
-           + g2(inp("Temporalidad (meses)",`q_${k}_${idx}_temporalidad`,it.temporalidad,"number"), inp("Renta mensual ($)",`q_${k}_${idx}_renta`,it.renta,"number",false,"0.00"))
-           + g2(inp("Impresión ($)",`q_${k}_${idx}_impresion`,it.impresion,"number",false,"0.00"), inp("Instalación ($)",`q_${k}_${idx}_instalacion`,it.instalacion,"number",false,"0.00"))
-           + `<div style="margin-top:10px">${inp("Descuento (%)",`q_${k}_${idx}_descuento`,it.descuento,"number",false,"0")}</div>`
-           + `<div style="margin-top:10px">${txa("Notas",`q_${k}_${idx}_notas`,it.notas,2)}</div>`;
-  } else if (k==="valla") {
-    fields = g2(inp("Temporalidad (meses)",`q_${k}_${idx}_temporalidad`,it.temporalidad,"number"), inp("Renta mensual ($)",`q_${k}_${idx}_renta`,it.renta,"number",false,"0.00"))
-           + `<div style="margin-top:10px">${inp("Descuento (%)",`q_${k}_${idx}_descuento`,it.descuento,"number",false,"0")}</div>`
-           + `<div style="margin-top:10px">${txa("Notas",`q_${k}_${idx}_notas`,it.notas,2)}</div>`;
-  } else if (k==="remolque") {
-    fields = `<div>${inp("Lugar / Ubicación",`q_${k}_${idx}_lugar`,it.lugar,"text",false,"Av. Principal #123")}</div>`
-           + g2(inp("Temporalidad (meses)",`q_${k}_${idx}_temporalidad`,it.temporalidad,"number"), inp("Renta mensual ($)",`q_${k}_${idx}_renta`,it.renta,"number",false,"0.00"))
-           + g2(inp("Impresión ($)",`q_${k}_${idx}_impresion`,it.impresion,"number",false,"0.00"), inp("Instalación ($)",`q_${k}_${idx}_instalacion`,it.instalacion,"number",false,"0.00"))
-           + `<div style="margin-top:10px">${inp("Descuento (%)",`q_${k}_${idx}_descuento`,it.descuento,"number",false,"0")}</div>`
-           + `<div style="margin-top:10px">${txa("Notas",`q_${k}_${idx}_notas`,it.notas,2)}</div>`;
-  } else if (k==="pantalla") {
-    const planes=["Básico","Intermedio","Premium"];
-    fields = `<div>${inp("Lugar / Ubicación",`q_${k}_${idx}_lugar`,it.lugar,"text",false,"Centro Comercial XYZ")}</div>`
-           + `<div style="margin-top:10px"><label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Plan de renta</label>
-              <div style="display:flex;gap:6px">${planes.map(p=>`<button onclick="syncAndSetPlan('${k}',${idx},'${p}')" style="flex:1;padding:7px 0;border-radius:8px;border:1px solid ${it.plan===p?G.purple:G.border};background:${it.plan===p?G.purple+"18":G.bg};color:${it.plan===p?G.purple:G.muted};font-weight:600;font-size:12px">${p}</button>`).join("")}</div></div>`
-           + g2(inp("Temporalidad (meses)",`q_${k}_${idx}_temporalidad`,it.temporalidad,"number"), inp("Renta mensual ($)",`q_${k}_${idx}_renta`,it.renta,"number",false,"0.00"))
-           + `<div style="margin-top:10px">${inp("Descuento (%)",`q_${k}_${idx}_descuento`,it.descuento,"number",false,"0")}</div>`
-           + `<div style="margin-top:10px">${txa("Notas",`q_${k}_${idx}_notas`,it.notas,2)}</div>`;
+  } catch (error) {
+    console.error("Fallo de conexión:", error);
+    alert('No se pudo conectar con el servidor central de Google Sheets. Verifica tu conexión a internet o la configuración del Script.');
+  } finally {
+    // Restaurar el botón
+    loginSubmitBtn.innerHTML = originalText;
+    loginSubmitBtn.disabled = false;
   }
+});
 
-  // Summary
-  let sumHTML = sumRow(`Renta ${fmt(renta)} × ${temp} mes(es)`, renta*temp);
-  if (k==="espectacular"||k==="remolque") {
-    sumHTML += sumRow("Impresión (única vez)", Number(it.impresion)||0);
-    sumHTML += sumRow("Instalación (única vez)", Number(it.instalacion)||0);
-    sumHTML += sumRow("Subtotal", r.subtotal, false, false, true);
-  }
-  if (it.descuento>0) sumHTML += sumRow(`Descuento ${it.descuento}%`, r.descAmt, false, false, false, true);
-  if (k==="espectacular"||k==="remolque") { sumHTML += sumRow("Base gravable", r.base, false, false, true); sumHTML += sumRow("IVA 16%", r.iva); }
-  sumHTML += sumRow("TOTAL"+(k==="espectacular"||k==="remolque"?" CON IVA":""), r.total, true, true, true);
-
-  const obs = k==="espectacular" ? "⚠️ En caso de cambio de lona, corre por cuenta del cliente."
-            : k==="remolque"     ? "⚠️ En caso de cambio de lona por diseño, corre por cuenta del cliente." : "";
-
-  return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px" id="qitem_${k}_${idx}">
-    <div style="display:flex;justify-content:space-between;margin-bottom:12px">
-      <span style="font-size:12px;font-weight:700;color:${m.color}">${m.label} ${idx+1}</span>
-      <button onclick="syncAndRemove('${k}',${idx})" style="font-size:11px;padding:3px 10px;border-radius:6px;background:transparent;border:1px solid var(--red);color:var(--red)">✕ Quitar</button>
-    </div>
-    ${fields}
-    <div style="margin-top:12px;background:var(--cardB);border-radius:8px;padding:10px 14px" id="sum_${k}_${idx}">${sumHTML}</div>
-    ${obs?`<p style="font-size:11px;color:var(--muted);margin-top:7px">${obs}</p>`:""}
-  </div>`;
+// Inicializar Aplicación al Autenticarse
+function initApp(user) {
+  loginScreen.style.display = 'none';
+  appShell.style.display = 'grid';
+  
+  document.getElementById('user-display-name').textContent = user.nombre || user.username;
+  document.getElementById('user-display-role').textContent = user.rol || 'Operador';
+  // Aquí puedes llamar a tus funciones para descargar clientes/cotizaciones de la hoja
+  console.log("¡Sesión iniciada correctamente!", user);
 }
 
-function syncAndRemove(k, idx) { syncQuoteInputs(); removeItem(k, idx); }
-function syncAndSetPlan(k, idx, plan) { syncQuoteInputs(); QS.quote[k].items[idx].plan=plan; renderQuote(); }
+// Cierre de Sesión
+document.getElementById('btn-logout').addEventListener('click', () => {
+  localStorage.removeItem('mayan_session');
+  location.reload();
+});
 
-async function saveQuote() {
-  syncQuoteInputs();
-  const c = S.quoteFor;
-  const grand = calcGrand(QS.quote);
-  const cotizacion = { date: new Date().toLocaleDateString("es-MX"), total: grand, quote: QS.quote, pagos: QS.pagos, finNotas: QS.finNotas };
-  const res = await api("saveCotizacion", { cotizacion, clienteId: c.id, clienteNombre: c.nombre });
-  if (res.ok) {
-    cotizacion.id = res.id;
-    if (!c.history) c.history=[];
-    c.history.unshift(cotizacion);
-    toast("Cotización guardada ✓");
-    goTab("clientes");
-  } else toast(res.error||"Error al guardar",false);
-}
-
-function exportPDFQuote() {
-  syncQuoteInputs();
-  buildPDF(S.quoteFor, QS.quote, QS.pagos);
-}
-function exportPDF_cot(cid, hid) {
-  const c = S.clients.find(x=>x.id===cid);
-  const h = c?.history?.find(x=>x.id===hid);
-  if (c && h) buildPDF(c, h.quote, h.pagos||[]);
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  PDF
-// ══════════════════════════════════════════════════════════════════════════════
-function buildPDF(client, quote, pagos=[]) {
-  const win = window.open("","_blank","width=860,height=700");
-  if (!win) { alert("Permite ventanas emergentes para exportar el PDF."); return; }
-  const grand = calcGrand(quote);
-  let spacesHTML="";
-  Object.keys(SPACE_META).forEach(k=>{
-    if(!quote[k]?.enabled||!quote[k].items.length) return;
-    const m=SPACE_META[k];
-    quote[k].items.forEach((it,idx)=>{
-      const r=calcItem(k,it);
-      const rows=[];
-      if(k==="espectacular"){rows.push(["Clave",it.clave||"—"],["Tamaño",it.tamano||"—"]);}
-      if(k==="remolque"||k==="pantalla") rows.push(["Lugar",it.lugar||"—"]);
-      if(k==="pantalla") rows.push(["Plan",it.plan||"—"]);
-      rows.push(["Temporalidad",`${it.temporalidad||1} mes(es)`],["Renta mensual",fmt(Number(it.renta)||0)]);
-      if(k==="espectacular"||k==="remolque"){rows.push(["Impresión (única vez)",fmt(Number(it.impresion)||0)],["Instalación (única vez)",fmt(Number(it.instalacion)||0)],["Subtotal",fmt(r.subtotal)]);}
-      if(it.descuento>0) rows.push([`Descuento ${it.descuento}%`,`- ${fmt(r.descAmt)}`]);
-      if(k==="espectacular"||k==="remolque"){rows.push(["Base gravable",fmt(r.base)],["IVA 16%",fmt(r.iva)]);}
-      rows.push(["TOTAL",`<strong style="color:#E8B84B">${fmt(r.total)}</strong>`]);
-      const obs=k==="espectacular"?"⚠️ Cambio de lona corre por cuenta del cliente.":k==="remolque"?"⚠️ Cambio de lona por diseño corre por cuenta del cliente.":"";
-      spacesHTML+=`<div class="sp"><div class="sh">${m.icon} ${m.label} ${idx+1}${(it.clave||it.lugar)?" — "+(it.clave||it.lugar):""}</div>
-        <table>${rows.map(([l,v])=>`<tr><td class="tl">${l}</td><td class="tr">${v}</td></tr>`).join("")}</table>
-        ${it.notas?`<p class="nt">📝 ${it.notas}</p>`:""}${obs?`<p class="ob">${obs}</p>`:""}</div>`;
-    });
+// Navegación Básica del Sidebar
+document.querySelectorAll('.sb-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+    
+    item.classList.add('active');
+    const targetView = item.getAttribute('data-view');
+    document.getElementById(view-${targetView}).classList.add('active');
   });
-  const totalPagado=pagos.filter(p=>p.tipo==="ingreso").reduce((a,p)=>a+(Number(p.monto)||0),0);
-  const saldo=grand-totalPagado;
-  win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Cotización – ${client.nombre}</title>
-<style>body{font-family:Georgia,serif;color:#1a1a1a;background:#fff}.page{max-width:720px;margin:0 auto;padding:44px 52px}
-.hdr{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:18px;border-bottom:3px solid #E8B84B;margin-bottom:24px}
-.brand{font-size:21px;font-weight:900;letter-spacing:-1px}.brand small{display:block;font-size:11px;font-weight:400;color:#888;margin-top:2px}
-.qn{text-align:right}.qn .n{font-size:19px;font-weight:700;color:#E8B84B}.qn small{display:block;color:#888;font-size:11px;margin-top:3px}
-.cb{background:#f8f8f8;border-radius:8px;padding:14px 18px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:4px 20px}
-.cb .ch{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#888;grid-column:1/-1;margin-bottom:6px;font-weight:600}
-.cb span{font-size:12px;color:#333}.cb span b{color:#111}
-.st{font-size:12px;font-weight:700;color:#555;border-left:3px solid #E8B84B;padding-left:10px;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.06em}
-.sp{margin-bottom:16px;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden}
-.sh{background:#f5f5f5;padding:8px 14px;font-weight:700;font-size:13px;color:#333}
-table{width:100%;border-collapse:collapse}.tl{padding:5px 14px;font-size:12px;color:#555}.tr{padding:5px 14px;font-size:12px;text-align:right}
-tr:nth-child(even) td{background:#fafafa}.nt{font-size:11px;color:#777;padding:6px 14px;font-style:italic}.ob{font-size:11px;color:#999;padding:4px 14px 8px}
-.gb{background:#0A0A0F;color:#fff;border-radius:10px;padding:16px 20px;margin-top:20px;display:flex;justify-content:space-between;align-items:center}
-.gl{font-size:11px;color:#aaa}.gv{font-size:22px;font-weight:700;color:#E8B84B}
-.ft{width:100%;border-collapse:collapse;margin-top:6px}.ft th{font-size:10px;text-transform:uppercase;color:#888;text-align:left;padding:4px 10px}
-.ft td{font-size:12px;padding:5px 10px;border-bottom:1px solid #f0f0f0}
-.sr{display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid #e0e0e0;margin-top:8px}
-.sr span:last-child{font-weight:700;font-size:14px;color:${saldo>0?"#E05252":"#4CC98A"}}
-footer{margin-top:34px;padding-top:12px;border-top:1px solid #eee;font-size:10px;color:#bbb;text-align:center}
-@media print{.page{padding:28px 32px}}</style></head><body>
-<div class="page">
-  <div class="hdr"><div class="brand">🟨 Espacios Publicitarios<small>Cotización profesional de espacios</small></div>
-    <div class="qn"><div class="n">COTIZACIÓN</div><small>${new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"})}</small></div></div>
-  <div class="cb"><div class="ch">Datos del cliente</div>
-    <span><b>Nombre:</b> ${client.nombre}</span><span><b>Empresa:</b> ${client.empresa||"—"}</span>
-    <span><b>WhatsApp:</b> ${client.whatsapp}</span><span><b>Tel. empresa:</b> ${client.telEmpresa||"—"}</span>
-    <span><b>Correo:</b> ${client.correo||"—"}</span></div>
-  <div class="st">Servicios cotizados</div>
-  ${spacesHTML||"<p style='color:#aaa;font-size:12px'>Sin servicios seleccionados.</p>"}
-  <div class="gb"><span class="gl">TOTAL GENERAL</span><span class="gv">${fmt(grand)}</span></div>
-  ${pagos.length?`<div class="st" style="margin-top:24px">Estado financiero</div>
-  <table class="ft"><tr><th>Fecha</th><th>Concepto</th><th style="text-align:right">Monto</th></tr>
-  ${pagos.map(p=>`<tr><td>${p.fecha||"—"}</td><td>${p.concepto}</td><td style="text-align:right;color:${p.tipo==="ingreso"?"#4CC98A":"#E05252"}">${p.tipo==="ingreso"?"+":"-"}${fmt(p.monto)}</td></tr>`).join("")}</table>
-  <div class="sr"><span>Saldo pendiente</span><span>${fmt(saldo)}</span></div>`:""}
-  <footer>Cotización válida por 30 días naturales. Precios sujetos a disponibilidad. Precios incluyen IVA donde se indica.</footer>
-</div><script>window.onload=()=>window.print()<\/script></body></html>`);
-  win.document.close();
-}
+});
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  VISTA: BASE
-// ══════════════════════════════════════════════════════════════════════════════
-let baseDates = {};
-function renderBase() {
-  const rentas=[];
-  S.clients.forEach(c=>{
-    (c.history||[]).forEach(h=>{
-      Object.keys(SPACE_META).forEach(k=>{
-        if(!h.quote?.[k]?.enabled) return;
-        (h.quote[k].items||[]).forEach((it,idx)=>{
-          rentas.push({clientId:c.id,clientName:c.nombre,empresa:c.empresa,type:k,item:{...it},idx,quoteDate:h.date,total:calcItem(k,it).total});
-        });
-      });
-    });
-  });
-  let currentFilter="todos";
-  function render(f) {
-    currentFilter=f;
-    const list=f==="todos"?rentas:rentas.filter(r=>r.type===f);
-    document.getElementById("baseList").innerHTML = list.length===0
-      ? `<div style="text-align:center;padding:60px 0;color:var(--muted)"><div style="font-size:40px;margin-bottom:10px">📋</div><p>No hay rentas. Guarda cotizaciones desde Clientes.</p></div>`
-      : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">${list.map((r,i)=>{
-          const m=SPACE_META[r.type],it=r.item,temp=Number(it.temporalidad)||1;
-          const key=`${r.clientId}-${r.type}-${r.idx}`;
-          const d=baseDates[key]||{};
-          return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:border .15s"
-            onmouseenter="this.style.borderColor='${m.color}'" onmouseleave="this.style.borderColor='var(--border)'">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-              <div>${badge(m.icon+" "+m.label,m.color)}${it.clave?`<div style="font-size:11px;color:var(--muted);margin-top:4px">Clave: ${esc(it.clave)}</div>`:""}${it.lugar?`<div style="font-size:11px;color:var(--muted);margin-top:4px">${esc(it.lugar)}</div>`:""}</div>
-              <div style="font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent)">${fmt(r.total)}</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 10px;background:var(--bg);border-radius:8px">
-              <div style="width:28px;height:28px;border-radius:50%;background:var(--accentS);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">${esc(r.clientName.charAt(0))}</div>
-              <div><div style="font-size:13px;font-weight:600">${esc(r.clientName)}</div>${r.empresa?`<div style="font-size:11px;color:var(--muted)">${esc(r.empresa)}</div>`:""}</div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-              <div style="background:var(--cardB);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Temporalidad</div><div style="font-size:15px;font-weight:700;margin-top:2px">${temp} ${temp===1?"mes":"meses"}</div></div>
-              <div style="background:var(--cardB);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Renta mensual</div><div style="font-size:15px;font-weight:700;margin-top:2px">${fmt(Number(it.renta)||0)}</div></div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-              <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Fecha inicio</div>
-                <input type="date" value="${d.inicio||""}" onchange="baseDates['${key}']={...(baseDates['${key}']||{}),inicio:this.value}" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 9px;color:var(--text);font-size:12px;outline:none"></div>
-              <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Fecha fin</div>
-                <input type="date" value="${d.fin||""}" onchange="baseDates['${key}']={...(baseDates['${key}']||{}),fin:this.value}" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 9px;color:var(--text);font-size:12px;outline:none"></div>
-            </div>
-            ${it.tamano?`<div style="font-size:11px;color:var(--muted)">📐 ${esc(it.tamano)}</div>`:""}
-            ${it.plan?`<div style="font-size:11px;color:var(--purple)">⭐ ${esc(it.plan)}</div>`:""}
-            <div style="font-size:10px;color:var(--muted);margin-top:10px;border-top:1px solid var(--border);padding-top:8px">Cotización del ${esc(r.quoteDate)}</div>
-          </div>`;
-        }).join("")}</div>`;
+// Verificar si ya había una sesión guardada previamente
+window.addEventListener('DOMContentLoaded', () => {
+  const savedSession = localStorage.getItem('mayan_session');
+  if (savedSession) {
+    try {
+      const user = JSON.parse(savedSession);
+      initApp(user);
+    } catch(e) {
+      localStorage.removeItem('mayan_session');
+    }
   }
-  document.getElementById("main").innerHTML = `<div class="fade-up">
-    <div style="margin-bottom:18px"><h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px">📋 BASE</h2><p style="font-size:13px;color:var(--muted)">Tarjetas de renta activa — espacio, temporalidad y fechas.</p></div>
-    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
-      ${["todos",...Object.keys(SPACE_META)].map(k=>`<button onclick="document.querySelectorAll('.bf').forEach(b=>b.style.background='var(--cardB)');this.style.background='var(--accentS)';renderBaseFilter('${k}')" class="bf" style="padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:${k==="todos"?"var(--accentS)":"var(--cardB)"};color:var(--muted);font-size:12px;font-weight:600">${k==="todos"?"Todos":SPACE_META[k].icon+" "+SPACE_META[k].label}</button>`).join("")}
-    </div>
-    <div id="baseList"></div>
-  </div>`;
-  window.renderBaseFilter = (f) => render(f);
-  render("todos");
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  VISTA: COLA (KANBAN)
-// ══════════════════════════════════════════════════════════════════════════════
-const KANBAN_COLS=[{id:"cotizacion",label:"📝 Cotización",color:G.blue},{id:"produccion",label:"⚙️ Producción",color:G.accent},{id:"implementacion",label:"🚀 Implementación",color:G.green}];
-const PRIO={urgente:G.red,alta:G.accent,normal:G.muted,baja:G.border};
-
-function renderCola() {
-  document.getElementById("main").innerHTML=`<div class="fade-up">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
-      <div><h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px">🗂️ COLA</h2><p style="font-size:13px;color:var(--muted)">Tablero Kanban — seguimiento de trabajos en proceso.</p></div>
-      ${btn("+ Nuevo trabajo","openColaModal()","primary")}
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px" id="kanbanBoard"></div>
-  </div>`;
-  renderKanban();
-}
-
-function renderKanban() {
-  const board=document.getElementById("kanbanBoard");
-  if(!board) return;
-  board.innerHTML=KANBAN_COLS.map(col=>{
-    const items=S.cola.filter(it=>it.col===col.id);
-    const cards=items.length===0
-      ? `<div style="text-align:center;padding:30px 0;color:var(--border);font-size:28px">◯</div>`
-      : items.map(it=>{
-          const c=S.clients.find(x=>x.id===it.clientId);
-          const others=KANBAN_COLS.filter(x=>x.id!==col.id);
-          return `<div style="background:var(--cardB);border-left:3px solid ${PRIO[it.priority]||G.muted};border:1px solid ${(PRIO[it.priority]||G.muted)}30;border-left:3px solid ${PRIO[it.priority]||G.muted};border-radius:10px;padding:12px 14px;margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-              <div style="font-size:13px;font-weight:600;flex:1;margin-right:8px">${esc(it.title)}</div>
-              <button onclick="deleteColaItem('${it.id}')" style="font-size:11px;padding:3px 8px;border-radius:6px;background:transparent;border:1px solid var(--red);color:var(--red)">✕</button>
-            </div>
-            ${c?`<div style="font-size:11px;color:var(--muted);margin-bottom:6px">👤 ${esc(c.nombre)}${c.empresa?" · "+esc(c.empresa):""}</div>`:""}
-            ${it.desc?`<p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5">${esc(it.desc)}</p>`:""}
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:10px;color:${PRIO[it.priority]||G.muted};font-weight:700;text-transform:uppercase;letter-spacing:.06em">● ${it.priority}</span>
-              <span style="font-size:10px;color:var(--muted)">${esc(it.date||"")}</span>
-            </div>
-            <div style="display:flex;gap:4px;margin-top:10px;flex-wrap:wrap">
-              ${others.map(oc=>`<button onclick="moveColaItem('${it.id}','${oc.id}')" style="font-size:10px;padding:3px 9px;border-radius:6px;background:transparent;border:1px solid ${oc.color}50;color:${oc.color};font-weight:600">→ ${oc.label.replace(/^\S+\s/,"")}</button>`).join("")}
-            </div>
-          </div>`;
-        }).join("");
-    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;min-height:320px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div style="font-size:13px;font-weight:700;color:${col.color}">${col.label}</div>
-        <div style="font-size:11px;background:${col.color}20;color:${col.color};padding:2px 8px;border-radius:20px;font-weight:700">${items.length}</div>
-      </div>${cards}</div>`;
-  }).join("");
-}
-
-function openColaModal() {
-  openModal(`
-    <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:18px">➕ Nuevo trabajo</h3>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div><label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Cliente</label>
-        <select id="cola_cli" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px">
-          <option value="">— Sin cliente —</option>${S.clients.map(c=>`<option value="${c.id}">${esc(c.nombre)}${c.empresa?" ("+esc(c.empresa)+")":""}</option>`).join("")}
-        </select></div>
-      ${inp("Título del trabajo","cola_title","","text",true,"Ej. Espectacular Av. Reforma")}
-      <div><label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Etapa inicial</label>
-        <select id="cola_col" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px">
-          ${KANBAN_COLS.map(c=>`<option value="${c.id}">${c.label}</option>`).join("")}
-        </select></div>
-      <div><label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Prioridad</label>
-        <select id="cola_prio" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px">
-          <option value="baja">Baja</option><option value="normal" selected>Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option>
-        </select></div>
-      ${txa("Descripción","cola_desc","",2,"Detalles del trabajo...")}
-    </div>
-    <div style="display:flex;gap:8px;margin-top:18px">
-      ${btn("Agregar trabajo","saveColaItem()","primary")}
-      ${btn("Cancelar","closeModal()","muted")}
-    </div>`);
-}
-
-async function saveColaItem() {
-  const title = getInp("cola_title").trim();
-  if (!title) { toast("El título es obligatorio",false); return; }
-  const item = { clientId:document.getElementById("cola_cli")?.value||"", title, desc:getInp("cola_desc"), col:document.getElementById("cola_col")?.value||"cotizacion", priority:document.getElementById("cola_prio")?.value||"normal", date:new Date().toLocaleDateString("es-MX") };
-  const res = await api("saveColaItem",{item});
-  if (res.ok) { item.id=res.id; S.cola.push(item); closeModal(); renderKanban(); toast("Trabajo agregado"); }
-  else toast(res.error||"Error",false);
-}
-
-async function moveColaItem(id, col) {
-  const it=S.cola.find(x=>x.id===id); if(!it) return;
-  it.col=col;
-  const res=await api("updateColaItem",{item:it});
-  if(res.ok) renderKanban(); else toast("Error al mover",false);
-}
-
-async function deleteColaItem(id) {
-  const res=await api("deleteColaItem",{id});
-  if(res.ok){ S.cola=S.cola.filter(x=>x.id!==id); renderKanban(); toast("Eliminado"); }
-  else toast("Error",false);
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  VISTA: FINANZAS
-// ══════════════════════════════════════════════════════════════════════════════
-function renderFinanzas() {
-  const allH=S.clients.flatMap(c=>(c.history||[]).map(h=>({...h,clientName:c.nombre,empresa:c.empresa,clientId:c.id})));
-  const totalRev   =allH.reduce((a,h)=>a+(h.total||0),0);
-  const totalPagado=allH.reduce((a,h)=>a+((h.pagos||[]).filter(p=>p.tipo==="ingreso").reduce((b,p)=>b+(Number(p.monto)||0),0)),0);
-  const totalPend  =totalRev-totalPagado;
-  const conCots=S.clients.filter(c=>c.history?.length>0);
-
-  document.getElementById("main").innerHTML=`<div class="fade-up">
-    <div style="margin-bottom:20px"><h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px">💰 FINANZAS</h2><p style="font-size:13px;color:var(--muted)">Ingresos, egresos, pagos y estado de cuenta por cliente.</p></div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
-      ${[{label:"Total cotizado",val:totalRev,color:G.accent,icon:"📊"},{label:"Total cobrado",val:totalPagado,color:G.green,icon:"✅"},{label:"Saldo pendiente",val:totalPend,color:totalPend>0?G.red:G.green,icon:"⏳"}].map(k=>`
-      <div style="background:var(--card);border:1px solid ${k.color}30;border-radius:14px;padding:18px 20px">
-        <div style="font-size:22px;margin-bottom:8px">${k.icon}</div>
-        <div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;color:${k.color}">${fmt(k.val)}</div>
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:4px">${k.label}</div>
-      </div>`).join("")}
-    </div>
-    <div style="margin-bottom:18px">
-      <label style="font-size:11px;font-weight:600;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px">Filtrar por cliente</label>
-      <select onchange="renderFinanzasCliente(this.value)" style="background:var(--cardB);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-size:13px;min-width:240px">
-        <option value="todos">Todos los clientes</option>
-        ${conCots.map(c=>`<option value="${c.id}">${esc(c.nombre)}${c.empresa?" ("+esc(c.empresa)+")":""}</option>`).join("")}
-      </select>
-    </div>
-    <div id="finList"></div>
-  </div>`;
-
-  window.renderFinanzasCliente=(val)=>{
-    const show=val==="todos"?conCots:conCots.filter(c=>c.id===val);
-    document.getElementById("finList").innerHTML=show.length===0
-      ? `<div style="text-align:center;padding:60px 0;color:var(--muted)"><div style="font-size:40px;margin-bottom:10px">💰</div><p>Sin movimientos aún.</p></div>`
-      : show.map(c=>{
-          const totalC=c.history.reduce((a,h)=>a+(h.total||0),0);
-          const pagadoC=c.history.reduce((a,h)=>a+((h.pagos||[]).filter(p=>p.tipo==="ingreso").reduce((b,p)=>b+(Number(p.monto)||0),0)),0);
-          const saldoC=totalC-pagadoC;
-          const allP=c.history.flatMap(h=>(h.pagos||[]).map(p=>({...p,quoteDate:h.date})));
-          return card(`
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
-              <div><div style="font-weight:700;font-size:15px">${esc(c.nombre)}</div>${c.empresa?`<div style="font-size:12px;color:var(--muted)">${esc(c.empresa)}</div>`:""}</div>
-              <div style="text-align:right"><div style="font-size:11px;color:var(--muted)">Saldo pendiente</div><div style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;color:${saldoC>0?G.red:G.green}">${fmt(saldoC)}</div></div>
-            </div>
-            <div style="margin-bottom:16px">
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px"><span>Cobrado: ${fmt(pagadoC)}</span><span>Total: ${fmt(totalC)}</span></div>
-              <div style="height:6px;background:var(--cardB);border-radius:99px"><div style="height:100%;border-radius:99px;background:var(--green);width:${Math.min(100,totalC>0?(pagadoC/totalC)*100:0)}%;transition:width .3s"></div></div>
-            </div>
-            ${allP.length===0?`<p style="font-size:12px;color:var(--muted)">Sin movimientos registrados.</p>`:`
-            <div style="display:grid;grid-template-columns:100px 1fr 90px 90px;gap:0 10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:0 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px">
-              <span>Fecha</span><span>Concepto</span><span>Cot.</span><span style="text-align:right">Monto</span>
-            </div>
-            ${allP.map(p=>`<div style="display:grid;grid-template-columns:100px 1fr 90px 90px;gap:0 10px;font-size:12px;padding:6px 0;border-bottom:1px solid ${G.border}20;align-items:center">
-              <span style="color:var(--muted)">${esc(p.fecha||"—")}</span>
-              <span>${esc(p.concepto)}</span>
-              <span style="color:var(--muted);font-size:11px">${esc(p.quoteDate)}</span>
-              <span style="text-align:right;font-weight:600;color:${p.tipo==="ingreso"?G.green:G.red}">${p.tipo==="ingreso"?"+":"-"}${fmt(p.monto)}</span>
-            </div>`).join("")}
-            <div style="display:flex;justify-content:space-between;padding:10px 0 0;border-top:1px solid var(--border);margin-top:8px">
-              <span style="font-size:12px;color:var(--muted)">Saldo pendiente</span>
-              <span style="font-size:14px;font-weight:700;color:${saldoC>0?G.red:G.green}">${fmt(saldoC)}</span>
-            </div>`}`, "margin-bottom:16px");
-        }).join("");
-  };
-  renderFinanzasCliente("todos");
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-//  START
-// ══════════════════════════════════════════════════════════════════════════════
-// Detectar Enter en login
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("loginUser")?.focus();
 });
 </script>
 </body>
 </html>
-
