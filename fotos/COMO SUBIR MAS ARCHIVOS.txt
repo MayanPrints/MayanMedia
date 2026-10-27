@@ -1,0 +1,10 @@
+Cada vez que agregues fotos nuevas a esa misma carpeta en tu computadora, solo debes abrir Git Bash allí y ejecutar estos tres comandos:
+
+# 1. Detectar las nuevas fotos que agregaste
+git add .
+
+# 2. Guardar los cambios con una nota (cambia el texto si quieres)
+git commit -m "Subir fotos nuevas"
+
+# 3. Mandarlas a GitHub de inmediato
+git push origin main
